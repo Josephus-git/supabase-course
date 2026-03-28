@@ -1,9 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { supabase } from "./supabase-client";
 
+interface tasks {
+  id: number;
+  created_at: string;
+  title: string;
+  description: string;
+}
+
 function App() {
   const [newTask, setNewTask] = useState({ title: "", description: ""});
+  const [tasks, setTasks] = useState<tasks[]>([]);
+
+  const fetchTasks = async () => {
+    const {error, data} = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Error reading tasks: ", error.message);
+      return;
+    }
+
+    setTasks(data);
+  }
 
   const handleSubmit = async (e: any) => {
 
@@ -19,6 +41,22 @@ function App() {
 
     setNewTask({title: "", description: ""});
   };
+
+  const handleDelete = async (id: number) => {
+    const { error } = await supabase.from("tasks").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting task", error.message);
+    }
+
+    console.log("Successfully deleted task")
+  }
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  console.log(tasks)
   
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", padding: "1rem" }}>
@@ -44,7 +82,10 @@ function App() {
 
       {/* List of Tasks */}
       <ul style={{ listStyle: "none", padding: 0 }}>
+        {tasks.map((task, key) => (
+        
         <li
+          key={key}
           style={{
             border: "1px solid #ccc",
             borderRadius: "4px",
@@ -53,16 +94,18 @@ function App() {
           }}
         >
           <div>
-            <h3>Title</h3>
-            <p>Description</p>
+            <h3>{task.title}</h3>
+            <p>{task.description}</p>
             <div>
               <button style={{ padding: "0.5rem 1rem", marginRight: "0.5rem" }}>
                 Edit
               </button>
-              <button style={{ padding: "0.5rem 1rem" }}>Delete</button>
+              <button style={{ padding: "0.5rem 1rem" }}
+              onClick={() => handleDelete(task.id)}>Delete</button>
             </div>
           </div>
         </li>
+        ))}
       </ul>
     </div>
   );
