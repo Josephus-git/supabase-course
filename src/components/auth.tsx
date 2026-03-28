@@ -11,23 +11,27 @@ export const Auth = () => {
 
     if (isSignUp) {
       const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
+        email, 
+        password
       });
+
       if (signUpError) {
         console.error("Error signing up:", signUpError.message);
-        return;
+        return
       }
+
     } else {
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email, 
+        password
       });
+
       if (signInError) {
-        console.error("Error signing up:", signInError.message);
-        return;
+        console.error("Error signingup:", signInError.message);
+        return
       }
     }
+
   };
 
   return (
