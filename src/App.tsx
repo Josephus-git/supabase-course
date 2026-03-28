@@ -11,6 +11,7 @@ interface tasks {
 
 function App() {
   const [newTask, setNewTask] = useState({ title: "", description: ""});
+  const [newDescription, setNewDescription] = useState("");
   const [tasks, setTasks] = useState<tasks[]>([]);
 
   const fetchTasks = async () => {
@@ -51,6 +52,21 @@ function App() {
 
     console.log("Successfully deleted task")
   }
+
+  const handleUpdate = async (id:number) => {
+
+    const { error } = await supabase
+    .from("tasks")
+    .update({description: newDescription})
+    .eq("id", id);
+
+    if (error) {
+      console.error("Error updating task", error.message);
+    }
+
+    console.log("Successfully deleted task")
+  }
+
 
   useEffect(() => {
     fetchTasks();
@@ -97,7 +113,13 @@ function App() {
             <h3>{task.title}</h3>
             <p>{task.description}</p>
             <div>
-              <button style={{ padding: "0.5rem 1rem", marginRight: "0.5rem" }}>
+              <textarea 
+                placeholder="Updating description..."
+                onChange={(e) => setNewDescription(e.target.value)} 
+              />
+              <button 
+                onClick={() => handleUpdate(task.id)}
+                style={{ padding: "0.5rem 1rem", marginRight: "0.5rem" }}>
                 Edit
               </button>
               <button style={{ padding: "0.5rem 1rem" }}
