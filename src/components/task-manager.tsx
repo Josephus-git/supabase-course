@@ -56,7 +56,7 @@ function TaskManager({ session }: { session: Session }) {
     const filePath = `${file.name}-${Date.now()}`;
 
     const { error } = await supabase.storage
-      .from("tasks-images")
+      .from("task_images")
       .upload(filePath, file);
 
     if (error) {
@@ -65,7 +65,7 @@ function TaskManager({ session }: { session: Session }) {
     }
 
     const { data } = await supabase.storage
-      .from("tasks-images")
+      .from("task_images")
       .getPublicUrl(filePath);
 
     return data.publicUrl;
